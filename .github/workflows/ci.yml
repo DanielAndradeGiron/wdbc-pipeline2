@@ -1,0 +1,19 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - run: python -m pip install -U pip && pip install -e ".[all]"
+      - run: ruff check src tests && ruff format --check src tests
+      - run: mypy src
+      - run: pytest
+      - run: python -m wdbc_pipeline run --config configs/quick.yaml --no-zip

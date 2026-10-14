@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+# Tooling
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+# Pipeline outputs (reproducible from code + config)
+outputs/
+*.zip
+# Data (keep the folder, not the files)
+data/raw/*
+!data/raw/.gitkeep
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/

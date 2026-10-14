@@ -1,0 +1,60 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Setup: crear .venv e instalar (dev + explain)",
+      "type": "shell",
+      "command": "python -m venv .venv && .venv/bin/python -m pip install -U pip && .venv/bin/python -m pip install -e \".[all]\"",
+      "windows": {
+        "command": "py -3.12 -m venv .venv; .venv\\Scripts\\python -m pip install -U pip; .venv\\Scripts\\python -m pip install -e \".[all]\""
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run: pipeline quick",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m wdbc_pipeline run --config configs/quick.yaml",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run: pipeline completo",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m wdbc_pipeline run --config configs/default.yaml",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run: réplica del notebook original",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m wdbc_pipeline run --config configs/notebook_replica.yaml",
+      "problemMatcher": []
+    },
+    {
+      "label": "Info: modelos y dependencias",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m wdbc_pipeline list-models",
+      "problemMatcher": []
+    },
+    {
+      "label": "Test: rápidos",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m pytest -m \"not slow\"",
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Test: todos (incluye end-to-end)",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m pytest",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Quality: ruff + mypy",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m ruff check src tests && ${command:python.interpreterPath} -m ruff format --check src tests && ${command:python.interpreterPath} -m mypy src",
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "Si utiliza este software, cítelo usando los metadatos de este archivo."
+type: software
+title: "wdbc-pipeline: leakage-resistant repeated nested validation for the WDBC dataset"
+abstract: >-
+  Reproducible pipeline that benchmarks ten calibrated ensemble classifiers on the
+  Wisconsin Diagnostic Breast Cancer dataset using repeated nested cross-validation,
+  a code-enforced locked internal holdout, a fully nested operating threshold,
+  bootstrap and exact confidence intervals, decision-curve analysis and explainability.
+authors:
+  - family-names: "Andrade Girón"
+    given-names: "Daniel Cristóbal"
+    affiliation: "Universidad Nacional José Faustino Sánchez Carrión"
+    orcid: "https://orcid.org/0000-0002-9746-3583"
+version: 1.0.0
+date-released: "2026-10-14"
+license: MIT
+repository-code: "https://github.com/SU-USUARIO/wdbc-pipeline"
+keywords:
+  - machine learning
+  - breast cancer
+  - nested cross-validation
+  - calibration
+  - reproducibility

@@ -1,0 +1,20 @@
+# Réplica fiel del notebook original (pipelin-06-08-26): misma fuente de datos,
+# doble balanceo y bootstrap con reemplazo en la sensibilidad de desarrollo.
+# Úsela para reproducir/comparar los resultados publicados.
+extends: default.yaml
+
+project:
+  run_name: notebook_replica
+
+data:
+  source: url
+  url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTIwMpLajJx3p9BL4RrvSTgEYVD4jJeeOuV5x4hjA46Tt9p9Knz9Je9Cu8-eHEYLlRAuyeOPGeAjmdz/pub?gid=547897578&single=true&output=csv"
+  # Tras la primera descarga, copie aquí el sha256 de metadata/source_manifest.json
+  # para que cualquier cambio en la hoja de cálculo detenga la ejecución.
+  expected_sha256: null
+
+models:
+  class_weight_with_oversampling: true
+
+evaluation:
+  dev_sensitivity_mode: bootstrap

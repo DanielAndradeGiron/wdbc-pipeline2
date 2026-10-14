@@ -1,0 +1,74 @@
+{
+  "version": "0.2.0",
+  "inputs": [
+    {
+      "id": "config",
+      "type": "pickString",
+      "description": "Configuración",
+      "options": ["configs/quick.yaml", "configs/default.yaml", "configs/notebook_replica.yaml"],
+      "default": "configs/quick.yaml"
+    },
+    {
+      "id": "stages",
+      "type": "promptString",
+      "description": "Etapas (separadas por espacio): data benchmark select stats threshold final holdout uncertainty curves explain report",
+      "default": "curves explain report"
+    },
+    {
+      "id": "runDir",
+      "type": "promptString",
+      "description": "Directorio de la ejecución existente (outputs/runs/<run>_<hash>)",
+      "default": "outputs/runs/"
+    }
+  ],
+  "configurations": [
+    {
+      "name": "Pipeline: quick (prueba estructural, ~2 min)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "wdbc_pipeline",
+      "args": ["run", "--config", "configs/quick.yaml"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Pipeline: completo (análisis publicable)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "wdbc_pipeline",
+      "args": ["run", "--config", "configs/default.yaml"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Pipeline: elegir configuración",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "wdbc_pipeline",
+      "args": ["run", "--config", "${input:config}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Pipeline: re-ejecutar etapas en un run existente",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "wdbc_pipeline",
+      "args": ["run", "--config", "${input:config}", "--run-dir", "${input:runDir}", "--stages", "${input:stages}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Pytest: archivo actual",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["${file}", "-v"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    }
+  ]
+}

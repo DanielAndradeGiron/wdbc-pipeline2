@@ -1,0 +1,107 @@
+# =============================================================================
+# WDBC pipeline — configuración por defecto (análisis completo, "preregistrable")
+# Cambie los valores ANTES de ejecutar cualquier análisis. Cada ejecución guarda
+# una copia de esta configuración y su hash en <run_dir>/metadata/.
+# =============================================================================
+project:
+  name: wdbc-pipeline
+  seed: 42
+  output_dir: outputs/runs     # carpeta raíz de las ejecuciones
+  run_name: full               # el directorio final será <run_name>_<config_hash>
+
+data:
+  # Fuente: "sklearn" (copia oficial de WDBC incluida en scikit-learn, offline),
+  #         "csv" (archivo local) o "url" (descarga; recomendado fijar expected_sha256).
+  source: sklearn
+  url: null
+  csv_path: data/raw/wdbc.csv
+  expected_sha256: null        # si se indica, la ejecución se detiene si el archivo cambia
+  target: diagnosis
+  positive_label: M
+  id_like_columns: [id, index, unnamed_0, unnamed_32, patient_id, record_id, name, email]
+  drop_duplicates: true
+  test_size: 0.20
+
+cv:
+  outer_splits: 10
+  outer_repeats: 5
+  inner_splits: 3
+  search_n_iter: 15
+  scoring: f1_weighted
+  calibration_method: sigmoid
+  calibration_splits: 3
+  stacking_splits: 5
+
+models:
+  include: [AdaBoost, GradientBoosting, RandomForest, ExtraTrees, BaggingExtraTree,
+            XGBoost, LightGBM, CatBoost, VotingSoft, Stacking]
+  on_missing_dependency: error   # "error" | "skip"
+  oversample: true               # RandomOverSampler dentro de cada ajuste (fold-local)
+  # MEJORA: el notebook original combinaba class_weight="balanced" + sobremuestreo
+  # (doble balanceo). Por defecto se usa solo sobremuestreo.
+  class_weight_with_oversampling: false
+  param_grids:
+    AdaBoost: {n_estimators: [50, 100, 200, 300], learning_rate: [0.01, 0.05, 0.1, 0.5]}
+    GradientBoosting: {n_estimators: [100, 200, 300], learning_rate: [0.01, 0.05, 0.1],
+                       max_depth: [2, 3, 4], subsample: [0.8, 0.9, 1.0]}
+    RandomForest: {n_estimators: [200, 400, 600], max_depth: [null, 3, 5, 10],
+                   min_samples_leaf: [1, 2, 4], max_features: [sqrt, log2, null]}
+    ExtraTrees: {n_estimators: [200, 400, 600], max_depth: [null, 3, 5, 10],
+                 min_samples_leaf: [1, 2, 4], max_features: [sqrt, log2, null]}
+    BaggingExtraTree: {n_estimators: [100, 200, 400], max_samples: [0.7, 0.85, 1.0],
+                       max_features: [0.7, 0.85, 1.0]}
+    XGBoost: {n_estimators: [100, 200, 300], max_depth: [2, 3, 4], learning_rate: [0.01, 0.05, 0.1]}
+    LightGBM: {n_estimators: [100, 200, 300], learning_rate: [0.01, 0.05, 0.1], num_leaves: [7, 15, 31]}
+    CatBoost: {iterations: [100, 200, 300], depth: [3, 4, 5, 6], learning_rate: [0.01, 0.05, 0.1]}
+    VotingSoft: {}
+    Stacking: {}
+
+selection:
+  # Cascada de tolerancias prácticas (en orden). Desempate: menor tiempo medio y luego nombre.
+  tolerances:
+    - {metric: f1_weighted, tolerance: 0.005, direction: max}
+    - {metric: mcc, tolerance: 0.010, direction: max}
+    - {metric: roc_auc, tolerance: 0.005, direction: max}
+    - {metric: brier, tolerance: 0.005, direction: min}
+
+stats:
+  alpha: 0.05
+  metric: f1_weighted
+
+threshold:
+  outer_splits: 5
+  min_sensitivity: 0.95
+  grid_start: 0.05
+  grid_stop: 0.95
+  grid_step: 0.01
+
+evaluation:
+  primary_threshold: 0.50
+  ece_bins: 10
+  ece_strategy: quantile
+  holdout_bootstrap: 2000
+  roc_bootstrap: 1000
+  dca_bootstrap: 1000
+  dca_grid: [0.05, 0.75, 0.01]
+  dev_sensitivity_repetitions: 100
+  # MEJORA: "subsample" (sin reemplazo) evita que filas duplicadas por bootstrap
+  # caigan a la vez en los folds de ajuste y de calibración interna.
+  dev_sensitivity_mode: subsample  # "subsample" | "bootstrap" (notebook original)
+  dev_subsample_fraction: 0.80
+
+explain:
+  enabled: true
+  permutation_repeats: 30
+  shap: true
+  shap_background: 80
+  shap_explained: 50
+  lime: true
+  lime_min_fidelity: 0.50
+  lime_num_samples: 20000
+
+runtime:
+  n_jobs: -1          # paralelismo sobre bloques externos (-1 = todos los núcleos)
+  checkpoint: true    # reanuda bloques ya calculados si se interrumpe
+  excel_export: true
+  figure_formats: [png, pdf, svg]
+  dpi: 600

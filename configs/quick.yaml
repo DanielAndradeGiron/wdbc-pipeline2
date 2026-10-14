@@ -1,0 +1,36 @@
+# Modo rápido: SOLO para pruebas estructurales (minutos). NO reporte sus resultados.
+# Hereda todo de default.yaml y sobrescribe lo indicado aquí.
+extends: default.yaml
+
+project:
+  run_name: quick
+
+cv:
+  outer_splits: 3
+  outer_repeats: 1
+  inner_splits: 2
+  search_n_iter: 2
+  calibration_splits: 2
+  stacking_splits: 3
+
+models:
+  on_missing_dependency: skip
+
+threshold:
+  outer_splits: 3
+
+evaluation:
+  holdout_bootstrap: 200
+  roc_bootstrap: 100
+  dca_bootstrap: 100
+  dev_sensitivity_repetitions: 3
+
+explain:
+  permutation_repeats: 5
+  shap_background: 20
+  shap_explained: 10
+  lime_num_samples: 2000
+
+runtime:
+  figure_formats: [png]
+  dpi: 150
