@@ -15,7 +15,7 @@ authors:
 version: 1.0.0
 date-released: "2026-10-14"
 license: MIT
-repository-code: "https://github.com/SU-USUARIO/wdbc-pipeline"
+repository-code: "https://github.com/DanielAndradeGiron/wdbc-pipeline"
 keywords:
   - machine learning
   - breast cancer
